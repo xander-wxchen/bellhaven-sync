@@ -1,23 +1,28 @@
 # Writeup
 
-**What I built.** Every day, a job reads Bellhaven's website and our CRM. When they don't match, it adds a
-suggested fix to a review page. Only a person's approval writes to the CRM. I made all 29 fixes this way,
-and running it again now finds nothing to fix.
+**What I built:** A daily job scrapes Bellhaven's 35 communities, reads the CRM, and queues each difference
+as a proposal. A reviewer approves, edits or rejects it in the web app, and only approved fixes are written
+to the CRM. I made all 29 fixes this way, with no errors. Running it again now finds nothing to fix.
 
-**How I match.** I look at the address first, because a facility's name often changes after a sale, but the
-building doesn't move. Name, phone and contacts only add a little. So Juniper's Amberly Manor in Colorado,
-which has the same name as a Bellhaven location in Ohio, was left alone. For duplicates, I keep the account
-already under Bellhaven or with billing or contacts, and set the others to Inactive. If an account has
-revenue and money still owed, I don't move it: I create a new account under Bellhaven and link the old one
-to it. A location missing from the website gets Needs Review, not Inactive, because a missing page doesn't
-prove it closed.
+**How I match a website location to a CRM account:** I look at the address first and the name second. When
+a facility is sold, its name often changes, but the building stays in the same place. The same street and
+ZIP are strong evidence. A matching/similar name, phone or contact person only adds a little.
 
-**How I used AI.** I built this with Claude Code. I made the main decisions, like address first and
-Needs Review instead of Inactive. I checked the work with 63 tests, read every fix before approving it, and
-at the end compared the CRM with its starting copy to make sure nothing else changed.
+When there are duplicates, I keep the account that is already under Bellhaven, or has billing or contacts.
+The extra accounts are marked as duplicates and set to Inactive. For the billing rule, if an account has
+revenue and outstanding AR, I don't move it. I create a new account under Bellhaven and link the old one to
+it. Otherwise I move the account directly. Lima had revenue but nothing owed, so it moved. If a location is
+no longer on the website, I set it to Needs Review, not Inactive, because a missing web page does not prove
+the facility closed.
 
-**Next steps.** First, use it for other companies. Only the scraper is made for Bellhaven, so a small
+**How I used AI:** I built this with Claude Code. I made the main decisions: address first, which duplicate
+to keep, Needs Review instead of Inactive, and a daily job that only reads the CRM. I also checked the work
+myself and wrote tests with a fake CRM. I compared a test run with the result I expected from the data, and
+I read every fix before I approved it. At the end, I compared the CRM with its starting copy: 25 accounts
+changed, 6 new accounts were added, 1 contact moved, and nothing else changed.
+
+**Next steps:** First, use it for other companies. Only the scraper is made for Bellhaven, so a small
 settings file per company would be enough. Second, make the review faster when there are hundreds of fixes,
 like the approval queues in Salesforce and the data quality tools in HubSpot. Simple, safe fixes such as a
-ZIP typo could be approved in bulk. Risky ones, like a new account or a billing case, would go to the
-account owner with an email or Slack alert, and all of it would live in a shared database with login.
+ZIP typo could be approved in bulk. Risky ones, like a new account or a billing case, would go to the account
+owner with an email or Slack alert, and all of it would live in a shared database with login.
