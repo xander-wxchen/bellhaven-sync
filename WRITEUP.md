@@ -1,38 +1,40 @@
 # Writeup
 
-**What I built.** A daily job scrapes Bellhaven's 35 communities, reads the CRM, and queues each
-difference as a proposal. A reviewer approves, edits or rejects it in a small web app; only Approve writes
-to the CRM. I made all 29 fixes that way with no failed writes, and a fresh run now finds nothing to change.
+**What I built.** Every day, a job reads Bellhaven's website (35 communities) and our CRM. When they don't
+match, it adds a suggested fix to a review page. A person approves, changes or rejects each fix. Only
+Approve writes to the CRM. I made all 29 fixes this way, with no errors. Running it again now finds
+nothing to fix.
 
-**Matching approach.** Address first, name second: a facility's name changes after a sale, its building
-doesn't.
-- **Evidence:** a normalized street and ZIP match carries most of the weight. Name, phone, and "the
-  website's administrator is a contact" only support it.
-- **Lookalikes:** a shared brand word alone never counts. That kept Juniper's Amberly Manor (Colorado) and
-  Union Square Senior Living untouched.
-- **Duplicates:** the record already under Bellhaven, or with billing or contacts, survives. The others
-  become Inactive duplicates.
-- **Billing SOP:** one tested function. Revenue and open AR above zero means a new account plus a CHOW
-  link (Tiffin, Marietta); otherwise the account moves directly (Lima has revenue but no AR).
-- **Not on the website:** Needs Review, not Inactive, because a missing page isn't proof of closure.
+**How I match a website location to a CRM account.** I look at the address first and the name second. When
+a facility is sold, its name often changes, but the building stays in the same place.
+- **Address:** the same street and ZIP gives the most points. A matching name, phone or contact person only
+  adds a little.
+- **Same name, different place:** a similar name alone is not enough. So Amberly Manor in Colorado and
+  Union Square Senior Living, owned by another company, were left alone.
+- **Duplicates:** I keep the account that is already under Bellhaven, or has billing or contacts. The extra
+  accounts are marked as duplicates and set to Inactive.
+- **Billing rule:** if an account has revenue and also money still owed, I don't move it. I create a new
+  account under Bellhaven and link the old one to it (Tiffin, Marietta). Otherwise I move the account
+  directly (Lima had revenue but nothing owed).
+- **Not on the website anymore:** I set the status to Needs Review, not Inactive. A missing web page does
+  not prove the facility closed.
 
-**How I used AI.** I built this with Claude Code as a pair programmer. I made the judgment calls:
-- address-first matching
-- which duplicate survives
+**How I used AI.** I built this with Claude Code. I made the main decisions:
+- address first
+- which duplicate to keep
 - Needs Review instead of Inactive
-- a read-only daily job
-- a clearer review screen after my first version
+- the daily job only reads the CRM
 
-I verified instead of trusting:
-- 63 offline tests against a fake CRM
-- a dry run compared with an end state I worked out by hand
-- reading every card before approving
-- a final diff of the live CRM against the original snapshot (25 accounts changed, 6 created, 1 contact
-  moved, nothing else touched)
+I checked the work myself:
+- 63 tests with a fake CRM
+- a test run compared with the result I expected from the data
+- I read every fix before I approved it
+- at the end, I compared the CRM with its starting copy: 25 accounts changed, 6 new accounts, 1 contact
+  moved, and nothing else
 
-**Next.**
-- Sync phone numbers; most differ from the website.
-- Add an HQ address to Bellhaven's parent account.
-- Review Harborview Care Group, which now has only inactive children.
-- Move the queue to a shared database with sign-in.
-- Add per-site configs for other operators.
+**Next steps.**
+- Sync phone numbers. Most of them are different from the website.
+- Add a head office address to the Bellhaven parent account.
+- Check Harborview Care Group, which now has only inactive accounts.
+- Keep the review data in a shared database with login.
+- Support websites of other companies.
