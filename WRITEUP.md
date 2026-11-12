@@ -16,7 +16,8 @@ prove it closed.
 Needs Review instead of Inactive. I checked the work with 63 tests, read every fix before approving it, and
 at the end compared the CRM with its starting copy to make sure nothing else changed.
 
-**Next steps.** First, sync phone numbers and contacts. At 15 of 35 locations the phone is different from
-the website, and sales needs it to reach the right person. Second, use it for other companies. Only the
-scraper is made for Bellhaven, so a small settings file per company would be enough, with a shared review
-database so a team can use it.
+**Next steps.** First, use it for other companies. Only the scraper is made for Bellhaven, so a small
+settings file per company would be enough. Second, make the review faster when there are hundreds of fixes,
+like the approval queues in Salesforce and the data quality tools in HubSpot. Simple, safe fixes such as a
+ZIP typo could be approved in bulk. Risky ones, like a new account or a billing case, would go to the
+account owner with an email or Slack alert, and all of it would live in a shared database with login.
