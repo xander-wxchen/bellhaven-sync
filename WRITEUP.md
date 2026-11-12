@@ -24,7 +24,14 @@ myself. There are 63 tests with a fake CRM. I compared a test run with the resul
 and I read every fix before I approved it. At the end, I compared the CRM with its starting copy: 25
 accounts changed, 6 new accounts were added, 1 contact moved, and nothing else changed.
 
-**Next steps.** I would sync phone numbers, because most of them are different from the website. I would
-add a head office address to the Bellhaven parent account, and check Harborview Care Group, which now has
-only inactive accounts. I would also keep the review data in a shared database with login, and support the
-websites of other companies.
+**Next steps.** I would work in two directions. First, sync more fields. Today the job checks the name,
+address, care type, parent and status. But at 15 of the 35 locations the CRM phone number is different from
+the website, and at 15 locations the administrator on the website is not a contact in the CRM. Sales needs
+both to reach the right person. I would add them to the same review flow: the website value is shown next
+to the CRM value, and nothing changes until someone approves.
+
+Second, use it for more companies, not only Bellhaven. The matching and the billing rule already work for
+any company. Only the scraper is made for Bellhaven's website. I would move the website details into a small
+settings file for each company, so adding a company means adding a settings file, not writing new code. With
+more companies, more people will review, so I would also move the review data into a shared database with
+login.
