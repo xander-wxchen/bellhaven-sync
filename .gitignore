@@ -1,0 +1,10 @@
+# secrets
+.env
+# private notes + case PDF (contains the API token)
+notes/
+# runtime state and outputs
+data/
+*.db
+__pycache__/
+.pytest_cache/
+.venv/

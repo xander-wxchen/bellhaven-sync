@@ -1,0 +1,88 @@
+# Daily Bellhaven CRM sync.
+#
+# What it does: scrape the operator website -> read the CRM -> queue proposals.
+# What it never does: write to the CRM. Writes only happen when a reviewer
+# approves a proposal in the review app.
+#
+# State: the review queue (decisions, overrides, issue log) must survive between
+# runs, otherwise decided items would come back. Here it's carried in the
+# Actions cache. In production the queue would live in a shared database that
+# both this job and the review app use (set REVIEW_DB / swap the Store backend).
+
+name: Daily Bellhaven CRM sync
+
+on:
+  schedule:
+    - cron: "0 11 * * *"     # 11:00 UTC = 6 am ET (7 am in summer): fresh queue before the sales day
+  workflow_dispatch: {}      # "Run workflow" button for an on-demand run
+
+concurrency:                 # never two runs at once; a late run waits instead of racing
+  group: bellhaven-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REVIEW_DB: data/review.db
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Tests (offline; they never touch the CRM)
+        run: python -m pytest -q
+
+      - name: Check the CRM token is configured
+        id: token
+        env:
+          CRM_TOKEN: ${{ secrets.CRM_TOKEN }}
+        run: |
+          if [ -z "$CRM_TOKEN" ]; then
+            echo "::notice::CRM_TOKEN secret not set (e.g. a fork). Skipping the sync; tests still ran."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore review queue from the last run
+        if: steps.token.outputs.present == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: data/review.db
+          key: review-db-${{ github.run_id }}
+          restore-keys: review-db-
+
+      - name: Scrape, match and queue proposals (read-only against the CRM)
+        if: steps.token.outputs.present == 'true'
+        env:
+          CRM_TOKEN: ${{ secrets.CRM_TOKEN }}
+        run: python -m bellhaven_sync run
+
+      - name: Save review queue for the next run
+        if: always() && steps.token.outputs.present == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: data/review.db
+          key: review-db-${{ github.run_id }}
+
+      - name: Upload run report
+        if: always() && steps.token.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-report-${{ github.run_id }}
+          path: |
+            data/issue_log.csv
+            data/site_locations.json
+          if-no-files-found: ignore
+          retention-days: 14

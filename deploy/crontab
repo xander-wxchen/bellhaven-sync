@@ -1,0 +1,16 @@
+# Run the daily sync on the same machine that serves the review app, so both
+# use the same review queue (data/review.db). Install with:  crontab deploy/crontab
+#
+# The job never writes to the CRM; it only refreshes the review queue.
+# Exit codes: 0 = ok or skipped (another run in progress), 1 = error, 2 = stopped by a safety guard.
+# MAILTO gets the output whenever the job prints to stderr or fails.
+
+CRON_TZ=America/New_York
+MAILTO=sales-ops@example.com
+
+# m  h  dom mon dow   command
+  0  6  *   *   *     cd /opt/bellhaven-sync && .venv/bin/python -m bellhaven_sync run >> data/cron.log 2>&1
+
+# Windows equivalent (Task Scheduler), run once in an admin prompt:
+# schtasks /Create /SC DAILY /ST 06:00 /TN "Bellhaven CRM Sync" ^
+#   /TR "cmd /c cd /d C:\bellhaven-sync && python -m bellhaven_sync run >> data\task.log 2>&1"

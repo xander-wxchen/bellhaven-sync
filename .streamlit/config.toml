@@ -1,0 +1,19 @@
+# Clipboard Health palette, used sparingly: crimson only for primary actions,
+# links and a thin header rule. Everything else stays neutral for an internal tool.
+[theme]
+base = "light"
+primaryColor = "#ca3051"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f7f5f0"
+textColor = "#37171a"
+font = "sans serif"
+
+[server]
+headless = true
+port = 8501
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
