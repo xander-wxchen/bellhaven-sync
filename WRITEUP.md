@@ -1,8 +1,8 @@
 # Writeup
 
-**What I built:** A daily job scrapes Bellhaven's 35 communities, reads the CRM, and queues each difference
-as a proposal. A reviewer approves, edits or rejects it in the web app, and only approved fixes are written
-to the CRM. I made all 29 fixes this way, with no errors. Running it again now finds nothing to fix.
+**What I built:** An automatic daily scraper reads Bellhaven's community webpages and the CRM, and queues
+each difference as a proposal. A reviewer approves, edits or rejects it in the web app, and only approved
+fixes are written to the CRM. I made all 29 fixes this way, with no errors. Running it again now finds nothing to fix.
 
 **How I match a website location to a CRM account:** I look at the address first and the name second. When
 a facility is sold, its name often changes, but the building stays in the same place. The same street and
@@ -16,7 +16,7 @@ no longer on the website, I set it to Needs Review, not Inactive, because a miss
 the facility closed.
 
 **How I used AI:** I built this with Claude Code. I made the main decisions: address first, which duplicate
-to keep, Needs Review instead of Inactive, and a daily job that only reads the CRM. I also checked the work
+to keep, Needs Review instead of Inactive, and a daily scraper that only reads the CRM. I also checked the work
 myself and wrote tests with a fake CRM. I compared a test run with the result I expected from the data, and
 I read every fix before I approved it. At the end, I compared the CRM with its starting copy: 25 accounts
 changed, 6 new accounts were added, 1 contact moved, and nothing else changed.
